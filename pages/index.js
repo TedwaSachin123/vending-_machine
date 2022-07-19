@@ -16,9 +16,10 @@ const VendingMachine=()=>{
     const [web3,setweb3] = useState(null);
     const [address,setAddress] = useState(null);
     const [vmcontract, setvmcontract] = useState(null);
+    const [load, setLoadingScreen] = useState("")
 
     useEffect(()=>{
-        if(address) connectWalletHandler()
+        
         if(vmcontract) getinventoryhandler() //useeffect will run the function once page get fully load
         if(vmcontract && address) getmydonutcounthandler()
     },[vmcontract, address])
@@ -37,12 +38,16 @@ const VendingMachine=()=>{
         setbuydonut(event.target.value)
         
     }
+
+    
     const buydonuthandler=async()=> {
-        try{
-            await vmcontract.methods.purchase(buydonut).send({
+      
+        try{setLoadingScreen('Transaction Pending !!');
+            let e = await vmcontract.methods.purchase(buydonut).send({
                 from:address,
                 value: web3.utils.toWei('2','ether')*buydonut
             })
+            setLoadingScreen('')
             setsuccess('donut purchase !!')
             seterror('')
             getinventoryhandler()
@@ -51,7 +56,7 @@ const VendingMachine=()=>{
         } catch(err){
             seterror(err.message)
         }
-        
+         
         
      }
 
@@ -128,6 +133,11 @@ const VendingMachine=()=>{
         <section>
             <div className='container has-text-success'>
                 <p>{success}</p>
+            </div>
+        </section>
+        <section>
+            <div className='container has-text'>
+                <p>{load}</p>
             </div>
         </section>
         
